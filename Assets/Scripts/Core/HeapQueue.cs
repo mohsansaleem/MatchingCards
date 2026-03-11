@@ -21,7 +21,25 @@ namespace MatchingCards.Core
 
         public bool Contains(T item) => _items.Contains(item);
 
-        public void Remove(T item) => _items.Remove(item);
+        public void Remove(T item)
+        {
+            int index = _items.IndexOf(item);
+            if (index < 0) return;
+
+            int last = _items.Count - 1;
+            if (index == last)
+            {
+                _items.RemoveAt(last);
+                return;
+            }
+
+            _items[index] = _items[last];
+            _items.RemoveAt(last);
+            if (index > 0 && Compare(_items[index], _items[(index - 1) >> 1]) < 0)
+                SiftDown(0, index);
+            else
+                SiftUp(index);
+        }
 
         public T Peek() => _items[0];
 
@@ -82,14 +100,15 @@ namespace MatchingCards.Core
             _items[pos] = newitem;
         }
 
-        void SiftUp()
+        void SiftUp() => SiftUp(0);
+
+        void SiftUp(int pos)
         {
             var endpos = _items.Count;
-            var startpos = 0;
+            var startpos = pos;
             //preserve the inserted item
-            var newitem = _items[0];
-            var childpos = 1;
-            var pos = 0;
+            var newitem = _items[pos];
+            var childpos = 2 * pos + 1;
             //find child position to insert into binary tree
             while (childpos < endpos)
             {

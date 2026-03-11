@@ -36,7 +36,7 @@ namespace MatchingCards.Core
         }
 
         /// <summary>
-        /// Clear all pending events and reset the tick to 0.
+        /// Clear all pending events.
         /// </summary>
         public static void Clear()
         {

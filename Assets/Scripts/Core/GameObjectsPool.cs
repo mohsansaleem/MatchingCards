@@ -5,16 +5,14 @@ using UnityEngine;
 
 namespace MatchingCards.Core
 {
-    public abstract class GameObjectsPool<TPo> : MonoBehaviour where TPo : MonoBehaviour
+    public abstract class GameObjectsPool<TPo> : MonoBehaviour where TPo : MonoBehaviour, IPoolItem
     {
         protected TPo Prefab;
         private Stack<TPo> _pool;
-        private int _poolLimit;
 
         protected void InitPool(TPo prefab, int count)
         {
             Prefab = prefab;
-            _poolLimit = count;
             _pool = new Stack<TPo>(count);
 
             for (int i = 0; i < count; i++)
@@ -41,7 +39,7 @@ namespace MatchingCards.Core
 
         public int AddItemToPool(TPo item)
         {
-            (item as IPoolItem).ReturnToPool();
+            item.ReturnToPool();
             _pool.Push(item);
             return _pool.Count;
         }
