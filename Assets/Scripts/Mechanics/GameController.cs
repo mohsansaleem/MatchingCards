@@ -82,7 +82,11 @@ namespace MatchingCards.Mechanics
                 config.ComboScoreBonus,
                 CurrentStageIndex);
 
-            SaveSystem.DeleteSave();
+            // Do NOT delete the save here — an existing save from a previous
+            // session should remain available on the Load button.  The save is
+            // only removed when the player explicitly overwrites it (SaveGame /
+            // HandleStagePassed auto-save) or when the whole game is completed
+            // (NotifyGameCompleted → DeleteSave).
         }
 
         // ── Stage advancement ─────────────────────────────────────────────────

@@ -107,11 +107,14 @@ namespace MatchingCards.UI
         {
             _state = AppState.Bootstrap;
 
+            // Activate the panel first so the button is enabled when we set
+            // interactable — Unity's DoStateTransition only fires on active objects.
+            SetPanelsActive(bootstrap: true, gameplay: false, pauseMenu: false);
+
             // Refresh Load button — only enabled when a save file exists.
             if (_bootstrapLoadButton != null)
                 _bootstrapLoadButton.interactable = _gameController.HasSave;
 
-            SetPanelsActive(bootstrap: true, gameplay: false, pauseMenu: false);
             Time.timeScale = 1;
         }
 
@@ -243,6 +246,9 @@ namespace MatchingCards.UI
             EnterGameplay();
             _cardBoardController.InitBoard(_gameController.model);
             _scoreHUD?.Refresh(_gameController.model);
+
+            // Auto-save so the Load button stays enabled if the player returns to menu.
+            _gameController.SaveGame();
         }
 
         /// <summary>
