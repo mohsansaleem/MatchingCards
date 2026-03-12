@@ -6,6 +6,12 @@ namespace MatchingCards.Config
     [CreateAssetMenu(fileName = "GameConfig", menuName = "ScriptableObjects/Create GameConfig ScriptableObject", order = 1)]
     public class GameConfig : ScriptableObject
     {
+        [Header("Card Visuals")]
+        /// <summary>
+        /// Sprite shown on the back of every card (face-down state).
+        /// </summary>
+        public Sprite CardBackSprite;
+
         [Header("Card Definitions")]
         /// <summary>
         /// Pool of card face sprites to pick from when building a grid.
@@ -30,6 +36,19 @@ namespace MatchingCards.Config
         /// Score per match = BaseMatchScore + ComboScoreBonus * (comboCount - 1)
         /// </summary>
         public int ComboScoreBonus = 50;
+
+        [Header("Sound Effects")]
+        /// <summary>Played every time a card is flipped face-up.</summary>
+        public AudioClip FlipClip;
+
+        /// <summary>Played when a pair matches but the game is not yet complete.</summary>
+        public AudioClip MatchClip;
+
+        /// <summary>Played when a pair does not match.</summary>
+        public AudioClip MismatchClip;
+
+        /// <summary>Played when the final pair is matched and the game is complete.</summary>
+        public AudioClip GameOverClip;
     }
 
     [System.Serializable]

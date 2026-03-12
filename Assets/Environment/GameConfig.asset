@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7e4ae49b9c49d1950866572ba5c15e, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: 
+  CardBackSprite: {fileID: 21300000, guid: 04d93ab94206df34483ea4d68da70dbb, type: 3}
+  CardMetaOptions:
+  - Name: Bear
+    Sprite: {fileID: 21300000, guid: f1623e5888bc0ad489da67532e1c67a4, type: 3}
+  - Name: Buffalo
+    Sprite: {fileID: 21300000, guid: 6c1f2887920cf4046928ff2bfef9b50a, type: 3}
+  - Name: Chick
+    Sprite: {fileID: 21300000, guid: 68644dac706872c459912f1dbb620ac3, type: 3}
+  - Name: Chicken
+    Sprite: {fileID: 21300000, guid: 551a0964e12379c4d96aefc165b8252d, type: 3}
+  - Name: Cow
+    Sprite: {fileID: 21300000, guid: 0e4e3874eae3e6146adeb5d4704cd468, type: 3}
+  - Name: Crocodile
+    Sprite: {fileID: 21300000, guid: 86de3d27ccf3f4f4f83f1af49c26bd2c, type: 3}
+  - Name: Dog
+    Sprite: {fileID: 21300000, guid: c4cd7ddda7f6b314e9762b4b69769500, type: 3}
+  - Name: Duck
+    Sprite: {fileID: 21300000, guid: abb2e4ba24194c246b127ab2480c6707, type: 3}
+  - Name: Elephant
+    Sprite: {fileID: 21300000, guid: d23e95d6a0ddbb64888e537e36dee760, type: 3}
+  - Name: Frog
+    Sprite: {fileID: 21300000, guid: faa06811d122c9f458de1ae4c04e7aba, type: 3}
+  - Name: Giraffe
+    Sprite: {fileID: 21300000, guid: 91a83ea9020654444af652dc18ae2255, type: 3}
+  - Name: Goat
+    Sprite: {fileID: 21300000, guid: b5e733a97dc094049a1d5362405ac832, type: 3}
+  - Name: Gorilla
+    Sprite: {fileID: 21300000, guid: 4c38690b8e8dfd548b9b405d516df516, type: 3}
+  - Name: Hippo
+    Sprite: {fileID: 21300000, guid: 5919742e35445e342a3757849fd264b1, type: 3}
+  - Name: Horse
+    Sprite: {fileID: 21300000, guid: c28acf7fd5204a64b913710af48b99e2, type: 3}
+  - Name: Monkey
+    Sprite: {fileID: 21300000, guid: 0614afc88c6f0e345984b32a681cbd5e, type: 3}
+  - Name: Moose
+    Sprite: {fileID: 21300000, guid: 5fa784f5536ccb74091e87155121bb32, type: 3}
+  - Name: Narwhal
+    Sprite: {fileID: 21300000, guid: 7058287fb8e15cc4f9c917b427490030, type: 3}
+  - Name: Owl
+    Sprite: {fileID: 21300000, guid: 969c1ab469c1c604f9a86291ba48182d, type: 3}
+  - Name: Panda
+    Sprite: {fileID: 21300000, guid: d8678bb8bd34b1047b77d403238aba6d, type: 3}
+  - Name: Parrot
+    Sprite: {fileID: 21300000, guid: 1653654c23c7faf4a8c63f83100763b4, type: 3}
+  - Name: Penguin
+    Sprite: {fileID: 21300000, guid: 9d456a03a7a43eb448abd0b721c80616, type: 3}
+  - Name: Pig
+    Sprite: {fileID: 21300000, guid: ca1ced25a32889b489112d1f077fb128, type: 3}
+  - Name: Rabbit
+    Sprite: {fileID: 21300000, guid: 6937c1ba7728fee428fb693be5a80aca, type: 3}
+  - Name: Rhino
+    Sprite: {fileID: 21300000, guid: d7d2e4ed229c31c4ca5e1e94e4e5f825, type: 3}
+  - Name: Sloth
+    Sprite: {fileID: 21300000, guid: bdf8ffd7013f66347af4fe1d886175c0, type: 3}
+  - Name: Snake
+    Sprite: {fileID: 21300000, guid: 45f16f7dbe4f36f43b342886a60b7e3f, type: 3}
+  - Name: Walrus
+    Sprite: {fileID: 21300000, guid: 601788895a7a60341a76ff6429e45d94, type: 3}
+  - Name: Whale
+    Sprite: {fileID: 21300000, guid: 306866397a5f7a748858c0be16fbdd7c, type: 3}
+  - Name: Zebra
+    Sprite: {fileID: 21300000, guid: bed414d3cfdd469438784c7d7b727016, type: 3}
+  GridLayouts:
+  - Label: "2\xD72"
+    Rows: 2
+    Columns: 2
+  - Label: "2\xD73"
+    Rows: 2
+    Columns: 3
+  - Label: "3\xD74"
+    Rows: 3
+    Columns: 4
+  - Label: "4\xD74"
+    Rows: 4
+    Columns: 4
+  - Label: "4\xD75"
+    Rows: 4
+    Columns: 5
+  - Label: "5\xD76"
+    Rows: 5
+    Columns: 6
+  BaseMatchScore: 100
+  ComboScoreBonus: 50
+  FlipClip: {fileID: 8300000, guid: adebf8846b5a4384bb7adcb42e8d6c07, type: 3}
+  MatchClip: {fileID: 8300000, guid: adcb0bc8d5fb3b54db898310fef34877, type: 3}
+  MismatchClip: {fileID: 8300000, guid: e2f2d9b9f8b5837458a8ad86dbf91d09, type: 3}
+  GameOverClip: {fileID: 8300000, guid: 4fd38b2302bd0a24381162ca5a114748, type: 3}
