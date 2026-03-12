@@ -17,8 +17,18 @@ namespace MatchingCards.Model
         public int Rows;
         public int Columns;
 
-        /// <summary>Total card pairs in the current grid.</summary>
-        public int TotalPairs => (Rows * Columns) / 2;
+        /// <summary>
+        /// Flat grid indices (row * Columns + col) of cells that have no card.
+        /// Populated from <see cref="GridLayout.EmptyCells"/> at Init time.
+        /// Persisted so save/load can reconstruct the board without the original config.
+        /// </summary>
+        public List<int> EmptyCellIndices = new List<int>();
+
+        /// <summary>Which stage (0-based index into GameConfig.GridLayouts) this game is on.</summary>
+        public int StageIndex;
+
+        /// <summary>Total card pairs in the current grid (empty cells excluded).</summary>
+        public int TotalPairs => (Rows * Columns - EmptyCellIndices.Count) / 2;
 
         /// <summary>True when all pairs have been matched.</summary>
         public bool IsComplete => MatchedPairs >= TotalPairs;
@@ -57,11 +67,20 @@ namespace MatchingCards.Model
         /// Initialises a fresh game from config values.
         /// Builds and shuffles the card list.
         /// </summary>
-        public void Init(int rows, int cols, List<CardMeta> availableMetas,
-                         int baseMatchScore, int comboScoreBonus)
+        /// <param name="emptyCells">
+        /// Cells to skip, expressed as (X = column, Y = row). Stored as flat indices
+        /// (row * cols + col) so the board controller can reconstruct the layout from
+        /// the model alone (e.g. after a save/load).
+        /// </param>
+        public void Init(int rows, int cols,
+                         List<Vector2Int> emptyCells,
+                         List<CardMeta> availableMetas,
+                         int baseMatchScore, int comboScoreBonus,
+                         int stageIndex = 0)
         {
             Rows            = rows;
             Columns         = cols;
+            StageIndex      = stageIndex;
             Score           = 0;
             ComboCount      = 0;
             MoveCount       = 0;
@@ -70,13 +89,34 @@ namespace MatchingCards.Model
             ComboScoreBonus = comboScoreBonus;
             PendingCardIndices = new List<int>();
 
+            EmptyCellIndices = new List<int>(emptyCells?.Count ?? 0);
+            if (emptyCells != null)
+                foreach (var c in emptyCells)
+                    EmptyCellIndices.Add(c.y * cols + c.x);  // X = col, Y = row
+
             BuildCards(availableMetas);
+        }
+
+        /// <summary>
+        /// Advances to a new stage while preserving the accumulated score.
+        /// All other state (cards, combos, moves) is reset as in a fresh game.
+        /// </summary>
+        public void InitNextStage(int rows, int cols,
+                                   List<Vector2Int> emptyCells,
+                                   List<CardMeta> availableMetas,
+                                   int baseMatchScore, int comboScoreBonus,
+                                   int stageIndex)
+        {
+            int savedScore = Score;
+            Init(rows, cols, emptyCells, availableMetas,
+                 baseMatchScore, comboScoreBonus, stageIndex);
+            Score = savedScore;
         }
 
         void BuildCards(List<CardMeta> availableMetas)
         {
             int pairs = TotalPairs;
-            Cards = new List<CardData>(Rows * Columns);
+            Cards = new List<CardData>(pairs * 2);
 
             for (int i = 0; i < pairs; i++)
             {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using MatchingCards.Config;
 using MatchingCards.Core;
 using MatchingCards.Mechanics.Events;
@@ -14,14 +15,20 @@ namespace MatchingCards.Mechanics
     ///
     /// Card-click events are wired here so that CardView stays decoupled from
     /// the Mechanics layer.
+    ///
+    /// Empty-cell support: cells listed in <see cref="MatchingCardsModel.EmptyCellIndices"/>
+    /// are skipped during layout — a gap is left in the grid but no card view is placed.
+    ///
+    /// Centering: the card grid is always centred inside <see cref="_boardContainer"/>
+    /// regardless of grid size, so smaller grids do not hug the top-left corner.
     /// </summary>
     public class CardBoardController : MonoBehaviour
     {
         public static CardBoardController Instance { get; private set; }
 
-        [SerializeField] CardPool _cardPool;
+        [SerializeField] CardPool      _cardPool;
         [SerializeField] RectTransform _boardContainer;
-        [SerializeField] GameConfig _config;
+        [SerializeField] GameConfig    _config;
 
         [Tooltip("Gap in pixels between cards and around the board edge.")]
         [SerializeField] float _cardSpacing = 10f;
@@ -63,22 +70,29 @@ namespace MatchingCards.Mechanics
             // rely on that cache.
             Canvas.ForceUpdateCanvases();
 
-            int total = model.Cards.Count;
-            _cardViews = new CardView[total];
+            _cardViews = new CardView[model.Cards.Count];
 
-            Vector2 cellSize = ComputeCellSize(model.Rows, model.Columns);
+            Vector2 cellSize   = ComputeCellSize(model.Rows, model.Columns);
+            Vector2 gridOffset = ComputeGridOffset(model.Rows, model.Columns, cellSize);
 
-            for (int i = 0; i < total; i++)
+            var emptySet  = new HashSet<int>(model.EmptyCellIndices);
+            int cardIndex = 0;
+
+            for (int gridPos = 0; gridPos < model.Rows * model.Columns; gridPos++)
             {
+                if (emptySet.Contains(gridPos)) continue;   // leave this cell blank
+
+                int row = gridPos / model.Columns;
+                int col = gridPos % model.Columns;
+
                 CardView view = _cardPool.GetCard();
-                view.Init(i, model.Cards[i], _config?.CardBackSprite);
+                view.Init(cardIndex, model.Cards[cardIndex], _config?.CardBackSprite);
                 view.OnCardClicked += OnCardViewClicked;
 
-                int row = i / model.Columns;
-                int col = i % model.Columns;
-                PositionCard(view.GetComponent<RectTransform>(), row, col, cellSize);
+                PositionCard(view.GetComponent<RectTransform>(), row, col, cellSize, gridOffset);
 
-                _cardViews[i] = view;
+                _cardViews[cardIndex] = view;
+                cardIndex++;
             }
         }
 
@@ -123,8 +137,10 @@ namespace MatchingCards.Mechanics
         // ── Layout helpers ────────────────────────────────────────────────────
 
         /// <summary>
-        /// Computes a uniform cell size that fits the grid inside the board container
-        /// while preserving square cards.
+        /// Computes a uniform cell size that fits the full rows×cols bounding box
+        /// inside the board container while preserving square cards.
+        /// Empty cells still occupy a slot in the bounding box — their gap is
+        /// intentional and keeps the grid aligned.
         /// Note: call after the Canvas layout pass so _boardContainer.rect is valid.
         /// </summary>
         Vector2 ComputeCellSize(int rows, int columns)
@@ -139,17 +155,33 @@ namespace MatchingCards.Mechanics
             return new Vector2(side, side);
         }
 
-        void PositionCard(RectTransform rt, int row, int col, Vector2 cellSize)
+        /// <summary>
+        /// Returns the (x, y) pixel offset needed to centre the grid inside the
+        /// board container. Applied to every card position so the whole grid sits
+        /// in the middle of the available area regardless of how many cells it has.
+        /// </summary>
+        Vector2 ComputeGridOffset(int rows, int cols, Vector2 cellSize)
+        {
+            float gridW = cols * cellSize.x + (cols + 1) * _cardSpacing;
+            float gridH = rows * cellSize.y + (rows + 1) * _cardSpacing;
+
+            float offsetX = Mathf.Max(0f, (_boardContainer.rect.width  - gridW) / 2f);
+            float offsetY = Mathf.Max(0f, (_boardContainer.rect.height - gridH) / 2f);
+
+            return new Vector2(offsetX, offsetY);
+        }
+
+        void PositionCard(RectTransform rt, int row, int col, Vector2 cellSize, Vector2 gridOffset)
         {
             rt.SetParent(_boardContainer, worldPositionStays: false);
             rt.sizeDelta = cellSize;
 
-            // Anchor and pivot at top-left so anchoredPosition goes right and down
+            // Anchor and pivot at top-left so anchoredPosition goes right and down.
             rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f);
             rt.pivot = new Vector2(0f, 1f);
 
-            float x =  _cardSpacing + col * (cellSize.x + _cardSpacing);
-            float y = -(_cardSpacing + row * (cellSize.y + _cardSpacing));
+            float x =  gridOffset.x + _cardSpacing + col * (cellSize.x + _cardSpacing);
+            float y = -(gridOffset.y + _cardSpacing + row * (cellSize.y + _cardSpacing));
             rt.anchoredPosition = new Vector2(x, y);
         }
 

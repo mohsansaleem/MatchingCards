@@ -69,7 +69,17 @@ namespace MatchingCards.Config
         public int Rows;
         public int Columns;
 
-        public int TotalCards => Rows * Columns;
+        /// <summary>
+        /// Cells to leave visually empty. Each entry is (X = column, Y = row), 0-based.
+        /// Example: a 4×5 grid with the two mid-cells of column 2 empty →
+        /// add Vector2Int(2, 1) and Vector2Int(2, 2).
+        /// The remaining active cell count must still be even.
+        /// </summary>
+        [Tooltip("Cells to leave empty. X = column index, Y = row index (both 0-based).")]
+        public List<UnityEngine.Vector2Int> EmptyCells = new List<UnityEngine.Vector2Int>();
+
+        /// <summary>Number of active (non-empty) card slots.</summary>
+        public int TotalCards => Rows * Columns - EmptyCells.Count;
 
         /// <summary>
         /// A layout is valid when it produces at least one pair and cards divide evenly into pairs.

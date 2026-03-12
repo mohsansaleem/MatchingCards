@@ -80,6 +80,7 @@ namespace MatchingCards.UI
         void OnEnable()
         {
             Instance = this;
+            GameController.OnStagePassed   += HandleStagePassed;
             GameController.OnGameCompleted += HandleGameCompleted;
             EnterBootstrap();
         }
@@ -87,6 +88,7 @@ namespace MatchingCards.UI
         void OnDisable()
         {
             if (Instance == this) Instance = null;
+            GameController.OnStagePassed   -= HandleStagePassed;
             GameController.OnGameCompleted -= HandleGameCompleted;
         }
 
@@ -229,11 +231,23 @@ namespace MatchingCards.UI
             EnterBootstrap();
         }
 
-        // ── Game-over (raised by GameController.OnGameCompleted event) ──────────
+        // ── Stage/game-over (raised by GameController events) ─────────────────
+
+        /// <summary>
+        /// Subscribed to <see cref="GameController.OnStagePassed"/>.
+        /// Automatically advances to the next stage, preserving the score.
+        /// </summary>
+        void HandleStagePassed()
+        {
+            _gameController.AdvanceToNextStage(_config);
+            EnterGameplay();
+            _cardBoardController.InitBoard(_gameController.model);
+            _scoreHUD?.Refresh(_gameController.model);
+        }
 
         /// <summary>
         /// Subscribed to <see cref="GameController.OnGameCompleted"/>.
-        /// Returns to the bootstrap screen when the last pair is matched.
+        /// Returns to the bootstrap screen when the last stage is finished.
         /// Save deletion is handled by <see cref="GameController.NotifyGameCompleted"/>
         /// before this callback fires, so no save management is needed here.
         /// </summary>
