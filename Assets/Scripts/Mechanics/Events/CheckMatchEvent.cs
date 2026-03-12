@@ -62,18 +62,14 @@ namespace MatchingCards.Mechanics.Events
         // ── Private ───────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Handles the game-complete state: removes the save (progress is done)
-        /// and signals the rest of the application via the OnExecute callback.
-        /// Wire up UI/score display by subscribing to CheckMatchEvent.OnExecute
-        /// and checking model.IsComplete.
+        /// Delegates the game-complete state entirely to GameController, which
+        /// owns the save lifecycle and broadcasts <see cref="GameController.OnGameCompleted"/>
+        /// for any subscriber (e.g. MetaGameController) to react to.
+        /// No UI types are imported here — the Mechanics layer stays self-contained.
         /// </summary>
         static void OnGameComplete()
         {
-            // Save is no longer needed once the game is won
-            GameController.Instance?.DeleteSave();
-
-            // TODO: raise a game-over event or notify MetaGameController
-            // e.g. MetaGameController.Instance?.ToggleMainMenu(show: true);
+            GameController.Instance?.NotifyGameCompleted();
         }
     }
 }

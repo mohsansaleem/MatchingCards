@@ -23,8 +23,6 @@ namespace MatchingCards.Audio
     [RequireComponent(typeof(AudioSource))]
     public class AudioManager : MonoBehaviour
     {
-        public static AudioManager Instance { get; private set; }
-
         [SerializeField] GameConfig _config;
 
         AudioSource _audioSource;
@@ -39,14 +37,12 @@ namespace MatchingCards.Audio
 
         void OnEnable()
         {
-            Instance = this;
             FlipCardEvent.OnExecute   += HandleFlip;
             CheckMatchEvent.OnExecute += HandleCheckMatch;
         }
 
         void OnDisable()
         {
-            if (Instance == this) Instance = null;
             FlipCardEvent.OnExecute   -= HandleFlip;
             CheckMatchEvent.OnExecute -= HandleCheckMatch;
         }

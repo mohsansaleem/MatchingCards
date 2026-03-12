@@ -2,6 +2,7 @@ using MatchingCards.Config;
 using MatchingCards.Core;
 using MatchingCards.Model;
 using UnityEngine;
+using GridLayout = MatchingCards.Config.GridLayout;
 
 namespace MatchingCards.Mechanics
 {
@@ -20,19 +21,43 @@ namespace MatchingCards.Mechanics
         // conveniently configured inside the inspector.
         public MatchingCardsModel model = Simulation.GetModel<MatchingCardsModel>();
 
-        void OnEnable()
-        {
-            Instance = this;
-        }
+        /// <summary>
+        /// Raised (on the main thread) when the last card pair is matched and
+        /// the game is complete. Subscribe here to react to game-over without
+        /// creating an upward dependency on the UI layer.
+        /// </summary>
+        public static event System.Action OnGameCompleted;
 
-        void OnDisable()
-        {
-            if (Instance == this) Instance = null;
-        }
+        // ── Unity lifecycle ───────────────────────────────────────────────────
+
+        void OnEnable()  => Instance = this;
+        void OnDisable() { if (Instance == this) Instance = null; }
 
         void Update()
         {
-            if (Instance == this) Simulation.Tick();
+            Simulation.Tick();
+        }
+
+        // ── New game ──────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Initialises the model for a brand-new game and clears any stale save.
+        /// Call <see cref="CardBoardController.InitBoard"/> immediately after
+        /// to rebuild the visual board from the freshly initialised model.
+        /// </summary>
+        /// <param name="layout">Grid dimensions to play.</param>
+        /// <param name="config">Game config supplying card metas and score values.</param>
+        public void StartNewGame(GridLayout layout, GameConfig config)
+        {
+            model.Init(
+                layout.Rows,
+                layout.Columns,
+                config.CardMetaOptions,
+                config.BaseMatchScore,
+                config.ComboScoreBonus);
+
+            // A stale save from a previous session is no longer valid.
+            SaveSystem.DeleteSave();
         }
 
         // ── Save / Load ───────────────────────────────────────────────────────
@@ -71,5 +96,19 @@ namespace MatchingCards.Mechanics
 
         /// <summary>True when a save file exists on disk.</summary>
         public bool HasSave => SaveSystem.HasSave;
+
+        // ── Game-over notification ────────────────────────────────────────────
+
+        /// <summary>
+        /// Called by <see cref="CheckMatchEvent"/> when the last pair is matched.
+        /// Clears the finished save and raises <see cref="OnGameCompleted"/> so
+        /// that higher-level systems (e.g. MetaGameController) can react without
+        /// being directly coupled to the mechanics layer.
+        /// </summary>
+        public void NotifyGameCompleted()
+        {
+            DeleteSave();
+            OnGameCompleted?.Invoke();
+        }
     }
 }

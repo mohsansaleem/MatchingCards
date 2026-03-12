@@ -42,11 +42,26 @@ namespace MatchingCards.Mechanics
         /// (e.g. from a mid-game save) are flipped back to face-down and cleared,
         /// since their in-flight comparison events cannot be restored.
         /// </para>
+        /// <para>
+        /// The caller is responsible for activating the board's canvas before
+        /// calling this method (so Unity registers it as dirty). This method
+        /// then calls <see cref="Canvas.ForceUpdateCanvases"/> to guarantee
+        /// that <see cref="_boardContainer"/>.rect reflects the true layout
+        /// size even on the very first call in a session.
+        /// </para>
         /// </summary>
         public void InitBoard(MatchingCardsModel model)
         {
             ClearBoard();
             ResetPendingCards(model);
+
+            // Force Unity to compute the canvas layout immediately.
+            // Without this, _boardContainer.rect is (0,0) the first time the
+            // canvas is activated in a session, causing cards to be positioned
+            // off-screen. Subsequent calls work because Unity caches the rect
+            // from the previous active session — but the first call cannot
+            // rely on that cache.
+            Canvas.ForceUpdateCanvases();
 
             int total = model.Cards.Count;
             _cardViews = new CardView[total];
